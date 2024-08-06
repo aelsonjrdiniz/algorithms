@@ -15,7 +15,10 @@ public class QuickSortLomuto {
 	}
 	
 	private static int particionaLomuto(int[] v, int ini, int fim) {
-		int pivot = medianaDeTres(v, ini, fim);
+		int indexPivot = medianaDeTres(v, ini, fim);
+		swap(v, ini, indexPivot);
+
+		int pivot = v[ini];
 		int i = ini;
 		for (int j = ini+1; j <= fim; j++) {
 			if (v[j] <= pivot) {
@@ -36,6 +39,12 @@ public class QuickSortLomuto {
 		int meio = (ini + fim)/2;
 		int[] sorted = new int[] {v[ini], v[meio], v[fim]};
 		Arrays.sort(sorted);
-		return sorted[1];
+		if (sorted[1] == ini) {
+			return ini;
+		} else if (sorted[1] == fim) {
+			return fim;
+		} else {
+			return (ini + fim)/2;
+		}
 	}
 }
