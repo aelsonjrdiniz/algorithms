@@ -2,6 +2,7 @@ import java.util.ArrayDeque;
 import java.util.Scanner;
 import java.lang.Math;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class BST {
 	
@@ -9,13 +10,17 @@ public class BST {
 		
 		Scanner sc = new Scanner(System.in);
 		String[] v = sc.nextLine().split(" ");
-
+		
+		//String[] u = sc.nextLine().split(" ");
+		int num = Integer.parseInt(sc.nextLine());		
 		BST tree = new BST();
+
 		for (String s: v) {
 			tree.add(Integer.parseInt(s));
 		}
 		
-		System.out.println(tree.toStringLarguraEsquerdaRec().trim());	
+		String[] s = tree.caminhoPredecessorTST(num).trim().split(" ");
+		System.out.println(Arrays.toString(s));
 	}
 
 	private Node root;
@@ -28,6 +33,143 @@ public class BST {
 
 	public boolean isEmpty() {
 		return this.size == 0;
+	}
+	
+	//Questão do TST
+	public void removeElementos(String[] v) {
+		ArrayList<Integer> lista = new ArrayList<>();
+		ArrayList<Integer> aux = new ArrayList<>();
+
+		for (String s: v) {
+			lista.add(Integer.parseInt(s));
+		}
+
+		while (!lista.isEmpty()) {
+			remove(lista.remove(0));
+			Node current = this.root;
+			preOrdemTST(aux, current);
+						
+			if (!isEmpty()) System.out.println(aux.toString());
+			else System.out.println("null");
+			
+			aux = new ArrayList<Integer>();	
+		}
+	}
+
+	//Questão do TST
+	public void buscaElemento(int valor) {
+		ArrayList<Integer> lista = new ArrayList<>();
+		if (isEmpty()) System.out.println(lista.toString());
+
+		buscaElemento(this.root, valor, lista);
+		System.out.println(lista.toString());
+	}
+
+	private void buscaElemento(Node current, int valor, ArrayList<Integer> lista) {
+		if (current == null) return;
+		lista.add(current.value);
+
+		if (current.value == valor) return;
+		else if (valor < current.value) buscaElemento(current.left, valor, lista);
+		else buscaElemento(current.right, valor, lista);
+	}
+
+	//Questão do TST
+        public String caminhoMin() {
+                if (isEmpty()) return "";
+                return caminhoMin(this.root);
+        }
+
+        private String caminhoMin(Node current) {
+                if (current != null) {
+                        return " " + current.value + caminhoMin(current.left);
+                } else return "";
+        }
+
+
+
+	//Questão do TST
+	public String caminhoMax() {
+		if (isEmpty()) return "";
+		return caminhoMax(this.root);
+	}
+
+	private String caminhoMax(Node current) {
+		if (current != null) {
+			return " " + current.value + caminhoMax(current.right);
+		} else return "";
+	}
+
+	//Questão do TST
+	public void elementosMaiores(int valor) {
+		ArrayList<Integer> lista = new ArrayList<>();
+		preOrdemTST(lista, this.root);
+		System.out.println(lista.toString());
+		System.out.println(encontraMaiores(valor));
+	}
+
+	//Questão do TST
+	public void elementosMenores(int valor) {
+		ArrayList<Integer> lista = new ArrayList<>();
+		preOrdemTST(lista, this.root);
+		System.out.println(lista.toString());
+		System.out.println(encontraMenores(valor));
+	}
+
+	private int encontraMenores(int valor) {
+		return encontraMenores(this.root, valor);
+	}
+
+	private int encontraMenores(Node current, int valor) {
+		if (current == null) return 0;
+		int qtde = 0;
+
+		if (current.value < valor) {
+			qtde = 1;
+		}
+
+		return qtde + encontraMenores(current.left, valor) + encontraMenores(current.right, valor);
+	}
+
+	private int encontraMaiores(int valor) {
+		return encontraMaiores(this.root, valor);
+	}
+
+	private int encontraMaiores(Node current, int valor) {
+		if (current == null) return 0;
+		int qtde = 0;
+
+		if (current.value > valor) {
+			qtde = 1;
+		}
+
+		return qtde + encontraMaiores(current.left, valor) + encontraMaiores(current.right, valor);
+	}
+
+	//Questão do TST
+	public void encontraMaisProximo(int valor) {
+		Node current = this.root;
+		Node answer = this.root;
+		
+		while (current != null) {
+			if (Math.abs(valor - current.value) < Math.abs(valor - answer.value)) answer = current;
+			if (valor < current.value) current = current.left;
+			else current = current.right;
+		}
+
+		ArrayList<Integer> lista = new ArrayList<>();
+		preOrdemTST(lista, this.root);
+		System.out.println(lista.toString());
+		System.out.println(answer.value);
+
+	}
+
+	private void preOrdemTST(ArrayList<Integer> lista, Node current) {
+		if (current != null) {
+			lista.add(current.value);
+			preOrdemTST(lista, current.left);
+			preOrdemTST(lista, current.right);
+		}
 	}
 
 	//Questão do TST
@@ -151,6 +293,32 @@ public class BST {
 		return msg;
 	}
 
+	//Questão pra tirar onda com Ewerton
+	public String caminhoPredecessorTST(int value) {
+		if (isEmpty()) return "";
+		
+		Node aux = search(value);
+		if (aux == null) return "";
+		
+		String msg = "";
+		msg += aux.value;
+		
+		if (aux.left != null) msg += minimoSubArvore(aux.left);
+		else msg += minAboveTST(aux.parent, value);
+		return msg;
+	}
+
+	private String minimoSubArvore(Node current) {
+		if (current == null) return "";
+		else return " " + current.value + minimoSubArvore(current.right);
+	}
+
+	private String minAboveTST(Node current, int value) {
+		if (current == null) return "";
+		else if (current.value < value) return " " + current.value;
+		else return " " + current.value + minAboveTST(current.parent,value);
+	}
+
 	//Questão do TST
 	public String caminhoPredecessor(int value) {
 		
@@ -234,6 +402,25 @@ public class BST {
 		else return 1 + Math.max(height(current.left), height(current.right));
 	}
 
+	public boolean equals(BST outra) {
+		if (outra == null) return false;
+
+		if ((isEmpty() && !outra.isEmpty()) || (!isEmpty() && outra.isEmpty())) return false;
+
+		return equals(this.root, outra.root);
+	} 
+
+	private boolean equals(Node n1, Node n2) {
+		if (n1 == null && n2 == null) return true;
+
+		if ((n1 == null && n2 != null) || (n1 != null && n2 == null)) return false;
+
+		if (n1.value != n2.value) return false;
+
+		return equals(n1.left, n2.left) && equals(n1.right, n2.right);
+
+	}
+
 	public Node min() {
 		if (isEmpty()) return null;
 		else return min(this.root);
@@ -314,59 +501,57 @@ public class BST {
 		if (current.value < value) return current;
 		else return maxAbove(current.parent, value);
 	}
-
+		
 	public void remove(int value) {
-		if (isEmpty()) return;
-		
-		Node aux = search(value);
-		if (aux == null) return;
-		
-		remove(aux);
-	}
-
-	private void remove(Node current) {
-		if (current.isLeaf()) removeFolha(current);
-		else if (current.hasOneChild()) removeNo(current);
-		else {
-			Node sucessor = sucessor(current);
-			current.value = sucessor.value;
-			remove(sucessor);
-		}
-	}
-
-	private void removeFolha(Node node) {
-		if (node.value == this.root.value) this.root = null;
-		else if (node.value < node.parent.value) node.parent.left = null;
-		else node.parent.right = null;
-	}
-
-	private void removeNo(Node node) {
-		if (node.hasOnlyLeftChild()) {
-			if (node.value == this.root.value) {
-				this.root = node.left;
-				this.root.parent = null;
-			} else {
-				node.left.parent = node.parent;
-				if (node.value < node.parent.value) {
-					node.parent.left = node.left;
-				} else {
-					node.parent.right = node.left;
-				}
-			}
-		} else {
-			if (node.value == this.root.value) {
-				this.root = node.right;
-				this.root.parent = null;
-			} else {
-				node.right.parent = node.parent;
-				if (node.value < node.parent.value) {
-					node.parent.left = node.right;
-				} else {
-					node.parent.right = node.right;
-				}
-			}
-		}
-	}
+        Node toRemove = search(value);
+        if (toRemove != null) {
+            remove(toRemove);
+            this.size -= 1;
+        }
+        
+    }
+	private void remove(Node toRemove) {
+        
+        if (toRemove.isLeaf()) {
+            if (toRemove.value == this.root.value)
+                this.root = null;
+            else {
+                if (toRemove.value < toRemove.parent.value)
+                    toRemove.parent.left = null;
+                else
+                    toRemove.parent.right = null;
+            }
+        
+        } else if (toRemove.hasOnlyLeftChild()) {
+            if (toRemove.value == this.root.value)  {
+                this.root = toRemove.left;
+                this.root.parent = null;
+            } else {
+                toRemove.left.parent = toRemove.parent;
+                if (toRemove.value < toRemove.parent.value)
+                    toRemove.parent.left = toRemove.left;
+                else
+                    toRemove.parent.right = toRemove.left;
+            }
+        } else if (toRemove.hasOnlyRightChild()) {
+            if (toRemove.value == this.root.value) {
+                this.root = toRemove.right;
+                this.root.parent = null;
+            } else {
+                toRemove.right.parent = toRemove.parent;
+                if (toRemove.value < toRemove.parent.value)
+                    toRemove.parent.left = toRemove.right;
+                else
+                    toRemove.parent.right = toRemove.right;
+            }
+            
+        } else {
+            Node sucessor = sucessor(toRemove);
+            toRemove.value = sucessor.value;
+            remove(sucessor);
+        }
+            
+    }
 
 	public void preOrdem() {
 		if (isEmpty()) return;
